@@ -12,7 +12,7 @@
     <!-- Visualization & Content Choices: 
         - Communication Flow Diagram (Section 1): Goal: Organize. Method: HTML/Tailwind diagram. Interaction: Hover to highlight stages. Justification: Visually breaks down the system components for easy understanding.
         - Uncoded Transmission Simulation (Section 2): Goal: Inform/Demonstrate Problem. Method: Interactive HTML elements updated with JS. Interaction: User clicks 'Kirim' to see a message get corrupted by 'noise'. Justification: Actively demonstrates the core problem of data corruption in a memorable way.
-        - Coded Transmission Simulation (Section 3): Goal: Inform/Demonstrate Solution. Method: Interactive HTML elements updated with JS. Interaction: User clicks 'Kirim' to see a redundant code detect an error. Justification: Directly contrasts with the previous simulation to show the power of redundancy.
+        - Coded Transmission Simulation (Section 3): Goal: Inform/Demonstrate Solution. Method: Interactive HTML elements updated with JS. Interaction: Directly contrasts with the previous simulation to show the power of redundancy.
         - Efficiency vs. Reliability Chart (Section 4): Goal: Compare. Method: Bar chart (Chart.js). Interaction: Tooltips on hover provide exact data. Justification: Quantifies the abstract concept of the trade-off, making it concrete and easy to compare.
         - Hamming Distance Calculator & Minimum Distance Decoder (Section 5): Goal: Quantify/Explain advanced concepts. Method: Interactive HTML inputs and dynamic text. Interaction: User enters binary strings and clicks a button to get the distance; a separate block explains the relationship between minimum distance and error correction capability. Justification: This interactive tool makes an abstract, mathematical concept of Hamming distance tangible and easy to explore. It directly implements the theory from the provided source.
         - BSC Probability Calculator (Section 6): Goal: Quantify/Explain. Method: Interactive form and dynamic text output. Interaction: User enters a bit error probability and sees the probabilities of correct and incorrect reception. Justification: This new feature directly addresses the user's request, providing a practical tool to understand the probabilistic nature of noise in a binary channel.
@@ -57,9 +57,51 @@
             max-height: 400px;
         }
         @media (min-width: 768px) {
-            .chart-container {
+            chart-container {
                 height: 350px;
             }
+        }
+        .bsc-diagram {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            width: 100%;
+            height: 200px;
+        }
+        .bsc-node {
+            width: 50px;
+            height: 50px;
+            background-color: #34495e;
+            border-radius: 50%;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            position: absolute;
+            z-index: 10;
+        }
+        .bsc-diagram svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 5;
+            overflow: visible;
+        }
+        .bsc-diagram line {
+            stroke-width: 2;
+        }
+        .arrowhead {
+            fill: #34495e;
+            stroke: #34495e;
+            stroke-width: 1;
+        }
+        .text-label {
+            font-size: 14px;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -230,8 +272,37 @@
         <!-- Section 6: BSC Probability Calculator -->
         <section id="bsc-calculator">
             <div class="card p-6 md:p-8">
-                <h2 class="text-2xl font-bold text-center mb-2 text-[#e5986d]">Kalkulator Peluang Binary Symmetric Channel (BSC)</h2>
-                <p class="text-center text-gray-600 mb-8">Kanal simetris biner (BSC) adalah model sederhana untuk memahami noise. Masukkan probabilitas kesalahan bit (p), dan lihat probabilitas bit yang diterima dengan benar dan salah.</p>
+                <h2 class="text-2xl font-bold text-center mb-2 text-[#e5986d]">Kanal Simetris Biner (BSC)</h2>
+                <p class="text-center text-gray-600 mb-8">Kanal simetris biner (BSC) adalah model sederhana untuk memahami noise. Diagram di bawah ini memvisualisasikan probabilitas kesalahan `p` dan probabilitas bit yang diterima dengan benar `1-p`.</p>
+
+                <!-- BSC Diagram -->
+                <div class="bsc-diagram mb-8">
+                    <div class="bsc-node" style="top: 25%; left: 15%;">0</div>
+                    <div class="bsc-node" style="top: 75%; left: 15%;">1</div>
+                    <div class="bsc-node" style="top: 25%; right: 15%;">0</div>
+                    <div class="bsc-node" style="top: 75%; right: 15%;">1</div>
+                    <svg>
+                        <!-- 0 to 0 (Correct) -->
+                        <line x1="20%" y1="28%" x2="80%" y2="28%" stroke="#27ae60" />
+                        <text x="50%" y="22%" text-anchor="middle" class="text-label" fill="#27ae60">1 - p</text>
+                        <polygon points="79%,27% 81%,29% 81%,25%" fill="#27ae60" />
+                        
+                        <!-- 0 to 1 (Error) -->
+                        <line x1="20%" y1="28%" x2="80%" y2="78%" stroke="#e74c3c" />
+                        <text x="50%" y="53%" text-anchor="middle" class="text-label" fill="#e74c3c">p</text>
+                        <polygon points="79%,77% 81%,79% 81%,75%" fill="#e74c3c" />
+
+                        <!-- 1 to 1 (Correct) -->
+                        <line x1="20%" y1="78%" x2="80%" y2="78%" stroke="#27ae60" />
+                        <text x="50%" y="82%" text-anchor="middle" class="text-label" fill="#27ae60">1 - p</text>
+                        <polygon points="79%,77% 81%,79% 81%,75%" fill="#27ae60" />
+
+                        <!-- 1 to 0 (Error) -->
+                        <line x1="20%" y1="78%" x2="80%" y2="28%" stroke="#e74c3c" />
+                        <text x="50%" y="53%" text-anchor="middle" class="text-label" fill="#e74c3c">p</text>
+                        <polygon points="79%,27% 81%,25% 81%,29%" fill="#e74c3c" />
+                    </svg>
+                </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
                     <!-- Input Form -->
@@ -449,8 +520,8 @@
 
                 bscErrorMessage.style.display = 'none';
                 const correctProb = (1 - p).toFixed(4);
-                correctProbSpan.textContent = correctProb;
                 errorProbResultSpan.textContent = p.toFixed(4);
+                correctProbSpan.textContent = correctProb;
             });
         });
     </script>
