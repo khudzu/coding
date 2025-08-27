@@ -8,13 +8,14 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <!-- Chosen Palette: Warm Neutrals with Soft Accents -->
-    <!-- Application Structure Plan: The application is structured as a narrative journey. It starts with a high-level introduction (Section 1), then dives into the core problem of 'noise' with an interactive simulation (Section 2). Section 3 presents the solution, 'channel coding', again with a simulation to show its effectiveness. Section 4 visualizes the trade-off between efficiency and reliability using a chart. The new Section 5 introduces advanced concepts like Hamming Distance and Minimum Distance Decoding to provide a deeper, quantitative understanding of error correction capabilities. This thematic flow was chosen to build understanding step-by-step, making a complex topic digestible. The interactive simulations and tools are key to letting users 'experience' the concepts, which is more engaging than static text. -->
+    <!-- Application Structure Plan: The application is structured as a narrative journey. It starts with a high-level introduction (Section 1), then dives into the core problem of 'noise' with an interactive simulation (Section 2). Section 3 presents the solution, 'channel coding', again with a simulation to show its effectiveness. Section 4 visualizes the trade-off between efficiency and reliability using a chart. The new Section 5 introduces advanced concepts like Hamming Distance and Minimum Distance Decoding to provide a deeper, quantitative understanding of error correction capabilities. Section 6 adds a calculator for the Binary Symmetric Channel (BSC) probability, allowing users to understand the channel's impact on transmission accuracy. This thematic flow was chosen to build understanding step-by-step, making a complex topic digestible. The interactive simulations and tools are key to letting users 'experience' the concepts, which is more engaging than static text. -->
     <!-- Visualization & Content Choices: 
         - Communication Flow Diagram (Section 1): Goal: Organize. Method: HTML/Tailwind diagram. Interaction: Hover to highlight stages. Justification: Visually breaks down the system components for easy understanding.
         - Uncoded Transmission Simulation (Section 2): Goal: Inform/Demonstrate Problem. Method: Interactive HTML elements updated with JS. Interaction: User clicks 'Kirim' to see a message get corrupted by 'noise'. Justification: Actively demonstrates the core problem of data corruption in a memorable way.
         - Coded Transmission Simulation (Section 3): Goal: Inform/Demonstrate Solution. Method: Interactive HTML elements updated with JS. Interaction: User clicks 'Kirim' to see a redundant code detect an error. Justification: Directly contrasts with the previous simulation to show the power of redundancy.
         - Efficiency vs. Reliability Chart (Section 4): Goal: Compare. Method: Bar chart (Chart.js). Interaction: Tooltips on hover provide exact data. Justification: Quantifies the abstract concept of the trade-off, making it concrete and easy to compare.
         - Hamming Distance Calculator & Minimum Distance Decoder (Section 5): Goal: Quantify/Explain advanced concepts. Method: Interactive HTML inputs and dynamic text. Interaction: User enters binary strings and clicks a button to get the distance; a separate block explains the relationship between minimum distance and error correction capability. Justification: This interactive tool makes an abstract, mathematical concept of Hamming distance tangible and easy to explore. It directly implements the theory from the provided source.
+        - BSC Probability Calculator (Section 6): Goal: Quantify/Explain. Method: Interactive form and dynamic text output. Interaction: User enters a bit error probability and sees the probabilities of correct and incorrect reception. Justification: This new feature directly addresses the user's request, providing a practical tool to understand the probabilistic nature of noise in a binary channel.
     -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
@@ -183,7 +184,7 @@
         </section>
 
         <!-- Section 5: Advanced Analysis -->
-        <section id="advanced-analysis">
+        <section id="advanced-analysis" class="mb-16">
             <div class="card p-6 md:p-8">
                 <h2 class="text-2xl font-bold text-center mb-2 text-[#e5986d]">Analisis Lanjutan: Jarak Hamming</h2>
                 <p class="text-center text-gray-600 mb-8">Jarak Hamming adalah metrik kunci untuk mengukur seberapa berbeda dua kata kode. Dengan jarak ini, kita bisa menentukan kemampuan deteksi dan koreksi kesalahan dari suatu kode.</p>
@@ -226,6 +227,46 @@
             </div>
         </section>
 
+        <!-- Section 6: BSC Probability Calculator -->
+        <section id="bsc-calculator">
+            <div class="card p-6 md:p-8">
+                <h2 class="text-2xl font-bold text-center mb-2 text-[#e5986d]">Kalkulator Peluang Binary Symmetric Channel (BSC)</h2>
+                <p class="text-center text-gray-600 mb-8">Kanal simetris biner (BSC) adalah model sederhana untuk memahami noise. Masukkan probabilitas kesalahan bit (p), dan lihat probabilitas bit yang diterima dengan benar dan salah.</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                    <!-- Input Form -->
+                    <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                        <h3 class="font-semibold text-lg mb-4 text-[#e5986d]">Masukan Probabilitas Kesalahan (p)</h3>
+                        <div class="flex flex-col space-y-4">
+                            <div>
+                                <label for="error-prob" class="block text-sm font-medium text-gray-700">Probabilitas Kesalahan (p) dari 0 hingga 1:</label>
+                                <input type="number" id="error-prob" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 font-mono" placeholder="misal: 0.05" step="0.01" min="0" max="1">
+                            </div>
+                            <button id="calculate-bsc" class="btn bg-[#d35400] text-white font-bold py-2 px-4 rounded-lg">Hitung Peluang</button>
+                        </div>
+                    </div>
+
+                    <!-- Results Display -->
+                    <div class="p-6 rounded-lg border border-gray-200 bg-white">
+                        <h3 class="font-semibold text-lg mb-4 text-[#e5986d]">Hasil Perhitungan BSC</h3>
+                        <div id="bsc-results" class="space-y-4">
+                            <div class="p-4 rounded-md bg-green-100 border border-green-300">
+                                <p class="font-bold">P(diterima | dikirim) = 1 - p</p>
+                                <p class="text-sm">Probabilitas bit diterima dengan benar: <span id="correct-prob" class="font-bold text-green-800">...</span></p>
+                            </div>
+                            <div class="p-4 rounded-md bg-red-100 border border-red-300">
+                                <p class="font-bold">P(diterima salah | dikirim) = p</p>
+                                <p class="text-sm">Probabilitas bit diterima salah: <span id="error-prob-result" class="font-bold text-red-800">...</span></p>
+                            </div>
+                        </div>
+                        <div id="bsc-error-message" class="mt-4 p-4 rounded-md bg-red-100 border border-red-300 text-red-800 hidden">
+                            <p>Masukkan nilai `p` yang valid (antara 0 dan 1).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
     </div>
 
     <script>
@@ -244,7 +285,6 @@
                 "110": { name: "Anggur", emoji: "🍇" }
             };
 
-            // Simulasi Tanpa Kode
             const sendUncodedBtn = document.getElementById('send-uncoded');
             const fruitSelector = document.getElementById('fruit-selector');
             const uncodedSent = document.getElementById('uncoded-sent');
@@ -276,7 +316,6 @@
                 }
             });
 
-            // Simulasi Dengan Kode
             const sendCodedBtn = document.getElementById('send-coded');
             const codedFruitSelector = document.getElementById('coded-fruit-selector');
             const codedSent = document.getElementById('coded-sent');
@@ -309,7 +348,6 @@
                 }
             });
 
-            // Grafik Trade-off
             const ctx = document.getElementById('tradeoff-chart').getContext('2d');
             new Chart(ctx, {
                 type: 'bar',
@@ -359,7 +397,6 @@
                 }
             });
 
-            // Lanjutan Materi Logic
             const word1Input = document.getElementById('word1');
             const word2Input = document.getElementById('word2');
             const calculateBtn = document.getElementById('calculate-hamming');
@@ -392,6 +429,28 @@
                     hammingResult.className = 'mt-6 p-4 rounded-md bg-white border border-gray-300 text-center font-bold text-lg';
                 }
                 hammingResult.style.display = 'block';
+            });
+
+            // Logic for BSC Calculator
+            const bscCalculateBtn = document.getElementById('calculate-bsc');
+            const errorProbInput = document.getElementById('error-prob');
+            const correctProbSpan = document.getElementById('correct-prob');
+            const errorProbResultSpan = document.getElementById('error-prob-result');
+            const bscErrorMessage = document.getElementById('bsc-error-message');
+
+            bscCalculateBtn.addEventListener('click', () => {
+                const p = parseFloat(errorProbInput.value);
+                if (isNaN(p) || p < 0 || p > 1) {
+                    bscErrorMessage.style.display = 'block';
+                    correctProbSpan.textContent = '...';
+                    errorProbResultSpan.textContent = '...';
+                    return;
+                }
+
+                bscErrorMessage.style.display = 'none';
+                const correctProb = (1 - p).toFixed(4);
+                correctProbSpan.textContent = correctProb;
+                errorProbResultSpan.textContent = p.toFixed(4);
             });
         });
     </script>
