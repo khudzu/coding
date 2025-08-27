@@ -284,22 +284,22 @@
                     <svg>
                         <!-- 0 to 0 (Correct) -->
                         <line x1="20%" y1="28%" x2="80%" y2="28%" stroke="#27ae60" />
-                        <text x="50%" y="22%" text-anchor="middle" class="text-label" fill="#27ae60">1 - p</text>
+                        <text id="prob-correct-label-1" x="50%" y="22%" text-anchor="middle" class="text-label" fill="#27ae60">1 - p</text>
                         <polygon points="79%,27% 81%,29% 81%,25%" fill="#27ae60" />
                         
                         <!-- 0 to 1 (Error) -->
                         <line x1="20%" y1="28%" x2="80%" y2="78%" stroke="#e74c3c" />
-                        <text x="50%" y="53%" text-anchor="middle" class="text-label" fill="#e74c3c">p</text>
+                        <text id="prob-error-label-1" x="50%" y="53%" text-anchor="middle" class="text-label" fill="#e74c3c">p</text>
                         <polygon points="79%,77% 81%,79% 81%,75%" fill="#e74c3c" />
 
                         <!-- 1 to 1 (Correct) -->
                         <line x1="20%" y1="78%" x2="80%" y2="78%" stroke="#27ae60" />
-                        <text x="50%" y="82%" text-anchor="middle" class="text-label" fill="#27ae60">1 - p</text>
+                        <text id="prob-correct-label-2" x="50%" y="82%" text-anchor="middle" class="text-label" fill="#27ae60">1 - p</text>
                         <polygon points="79%,77% 81%,79% 81%,75%" fill="#27ae60" />
 
                         <!-- 1 to 0 (Error) -->
                         <line x1="20%" y1="78%" x2="80%" y2="28%" stroke="#e74c3c" />
-                        <text x="50%" y="53%" text-anchor="middle" class="text-label" fill="#e74c3c">p</text>
+                        <text id="prob-error-label-2" x="50%" y="53%" text-anchor="middle" class="text-label" fill="#e74c3c">p</text>
                         <polygon points="79%,27% 81%,25% 81%,29%" fill="#e74c3c" />
                     </svg>
                 </div>
@@ -508,6 +508,10 @@
             const correctProbSpan = document.getElementById('correct-prob');
             const errorProbResultSpan = document.getElementById('error-prob-result');
             const bscErrorMessage = document.getElementById('bsc-error-message');
+            const probCorrectLabel1 = document.getElementById('prob-correct-label-1');
+            const probCorrectLabel2 = document.getElementById('prob-correct-label-2');
+            const probErrorLabel1 = document.getElementById('prob-error-label-1');
+            const probErrorLabel2 = document.getElementById('prob-error-label-2');
 
             bscCalculateBtn.addEventListener('click', () => {
                 const p = parseFloat(errorProbInput.value);
@@ -522,6 +526,12 @@
                 const correctProb = (1 - p).toFixed(4);
                 errorProbResultSpan.textContent = p.toFixed(4);
                 correctProbSpan.textContent = correctProb;
+
+                // Update diagram labels
+                probCorrectLabel1.textContent = `1 - p (${correctProb})`;
+                probCorrectLabel2.textContent = `1 - p (${correctProb})`;
+                probErrorLabel1.textContent = `p (${p.toFixed(4)})`;
+                probErrorLabel2.textContent = `p (${p.toFixed(4)})`;
             });
         });
     </script>
