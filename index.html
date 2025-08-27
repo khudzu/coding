@@ -8,12 +8,13 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <!-- Chosen Palette: Warm Neutrals with Soft Accents -->
-    <!-- Application Structure Plan: The application is structured as a narrative journey. It starts with a high-level introduction (Section 1), then dives into the core problem of 'noise' with an interactive simulation (Section 2). Section 3 presents the solution, 'channel coding', again with a simulation to show its effectiveness. Section 4 visualizes the trade-off between efficiency and reliability using a chart. This thematic flow was chosen to build understanding step-by-step, making a complex topic digestible. The interactive simulations are key to letting users 'experience' the concepts, which is more engaging than static text. -->
+    <!-- Application Structure Plan: The application is structured as a narrative journey. It starts with a high-level introduction (Section 1), then dives into the core problem of 'noise' with an interactive simulation (Section 2). Section 3 presents the solution, 'channel coding', again with a simulation to show its effectiveness. Section 4 visualizes the trade-off between efficiency and reliability using a chart. The new Section 5 introduces advanced concepts like Hamming Distance and Minimum Distance Decoding to provide a deeper, quantitative understanding of error correction capabilities. This thematic flow was chosen to build understanding step-by-step, making a complex topic digestible. The interactive simulations and tools are key to letting users 'experience' the concepts, which is more engaging than static text. -->
     <!-- Visualization & Content Choices: 
         - Communication Flow Diagram (Section 1): Goal: Organize. Method: HTML/Tailwind diagram. Interaction: Hover to highlight stages. Justification: Visually breaks down the system components for easy understanding.
         - Uncoded Transmission Simulation (Section 2): Goal: Inform/Demonstrate Problem. Method: Interactive HTML elements updated with JS. Interaction: User clicks 'Kirim' to see a message get corrupted by 'noise'. Justification: Actively demonstrates the core problem of data corruption in a memorable way.
         - Coded Transmission Simulation (Section 3): Goal: Inform/Demonstrate Solution. Method: Interactive HTML elements updated with JS. Interaction: User clicks 'Kirim' to see a redundant code detect an error. Justification: Directly contrasts with the previous simulation to show the power of redundancy.
         - Efficiency vs. Reliability Chart (Section 4): Goal: Compare. Method: Bar chart (Chart.js). Interaction: Tooltips on hover provide exact data. Justification: Quantifies the abstract concept of the trade-off, making it concrete and easy to compare.
+        - Hamming Distance Calculator & Minimum Distance Decoder (Section 5): Goal: Quantify/Explain advanced concepts. Method: Interactive HTML inputs and dynamic text. Interaction: User enters binary strings and clicks a button to get the distance; a separate block explains the relationship between minimum distance and error correction capability. Justification: This interactive tool makes an abstract, mathematical concept of Hamming distance tangible and easy to explore. It directly implements the theory from the provided source.
     -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
@@ -171,12 +172,56 @@
         </section>
 
         <!-- Section 4: Trade-off -->
-        <section id="tradeoff">
+        <section id="tradeoff" class="mb-16">
             <div class="card p-6 md:p-8">
                 <h2 class="text-2xl font-bold text-center mb-2 text-[#e5986d]">Kompromi: Efisiensi vs. Keandalan</h2>
                 <p class="text-center text-gray-600 mb-8">Menambahkan redundansi membuat komunikasi lebih andal, tetapi juga kurang efisien karena kita harus mengirim lebih banyak data. Grafik ini menunjukkan perbandingan jumlah bit yang dikirim untuk setiap metode.</p>
                 <div class="chart-container">
                     <canvas id="tradeoff-chart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 5: Advanced Analysis -->
+        <section id="advanced-analysis">
+            <div class="card p-6 md:p-8">
+                <h2 class="text-2xl font-bold text-center mb-2 text-[#e5986d]">Analisis Lanjutan: Jarak Hamming</h2>
+                <p class="text-center text-gray-600 mb-8">Jarak Hamming adalah metrik kunci untuk mengukur seberapa berbeda dua kata kode. Dengan jarak ini, kita bisa menentukan kemampuan deteksi dan koreksi kesalahan dari suatu kode.</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start mb-8">
+                    <!-- Hamming Distance Calculator -->
+                    <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                        <h3 class="font-semibold text-lg mb-4 text-[#e5986d]">Kalkulator Jarak Hamming</h3>
+                        <p class="text-sm text-gray-500 mb-4">Masukkan dua kata kode biner dengan panjang yang sama untuk menghitung jaraknya.</p>
+                        <div class="flex flex-col space-y-4">
+                            <div>
+                                <label for="word1" class="block text-sm font-medium text-gray-700">Kata Kode 1</label>
+                                <input type="text" id="word1" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 font-mono" placeholder="misal: 10110">
+                            </div>
+                            <div>
+                                <label for="word2" class="block text-sm font-medium text-gray-700">Kata Kode 2</label>
+                                <input type="text" id="word2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 font-mono" placeholder="misal: 10011">
+                            </div>
+                            <button id="calculate-hamming" class="btn bg-[#d35400] text-white font-bold py-2 px-4 rounded-lg">Hitung Jarak</button>
+                        </div>
+                        <div id="hamming-result" class="mt-6 p-4 rounded-md bg-white border border-gray-300 text-center font-bold text-lg hidden">
+                            Jarak: <span id="distance-value">...</span>
+                        </div>
+                    </div>
+
+                    <!-- Minimum Distance Explanation -->
+                    <div class="p-6 rounded-lg border border-gray-200 bg-white">
+                        <h3 class="font-semibold text-lg mb-4 text-[#e5986d]">Jarak Minimum & Kemampuan Koreksi</h3>
+                        <p class="text-gray-600 mb-4">Kemampuan koreksi kesalahan suatu kode ditentukan oleh **jarak minimumnya** (<span class="font-semibold">d(C)</span>). Jarak minimum adalah jarak Hamming terkecil antara semua pasangan kata kode yang berbeda.</p>
+                        <div class="bg-gray-50 p-4 rounded-lg mt-4">
+                            <p class="font-bold text-sm text-gray-700">Aturan Kunci:</p>
+                            <p class="text-sm mt-2">Sebuah kode dapat mengoreksi `t` kesalahan jika dan hanya jika <span class="font-bold text-[#d35400]">d(C) ≥ 2t + 1</span>.</p>
+                        </div>
+                        <div id="min-distance-example" class="mt-6 p-4 rounded-md bg-yellow-100 border border-yellow-300">
+                            <p class="font-semibold text-yellow-800">Contoh Kode: C = {000, 111}</p>
+                            <p class="text-sm text-yellow-700 mt-2">Jarak minimum dari kode ini adalah <span class="font-bold">3</span>. Berdasarkan aturan, kode ini dapat mengoreksi <span class="font-bold">1</span> kesalahan (karena 3 ≥ 2(1) + 1).</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -212,7 +257,6 @@
                 const selectedValue = fruitSelector.value;
                 uncodedSent.textContent = selectedValue;
 
-                // Simulasi noise: membalik satu bit secara acak
                 const bitToFlip = Math.floor(Math.random() * 2);
                 let receivedValue = selectedValue.split('');
                 receivedValue[bitToFlip] = receivedValue[bitToFlip] === '0' ? '1' : '0';
@@ -227,7 +271,6 @@
                     uncodedResultEmoji.textContent = receivedFruit.emoji;
                     uncodedResultCard.className = 'text-center p-4 rounded-lg bg-red-100 border border-red-300';
                 } else {
-                    // Should not happen in this simple 2-bit case but good practice
                     uncodedResultText.textContent = 'Data rusak parah!';
                     uncodedResultEmoji.textContent = '💥';
                 }
@@ -246,7 +289,6 @@
                 const selectedValue = codedFruitSelector.value;
                 codedSent.textContent = selectedValue;
 
-                // Simulasi noise: membalik satu bit secara acak
                 const bitToFlip = Math.floor(Math.random() * 3);
                 let receivedValue = selectedValue.split('');
                 receivedValue[bitToFlip] = receivedValue[bitToFlip] === '0' ? '1' : '0';
@@ -256,10 +298,9 @@
                 const originalFruit = codedFruitMap[selectedValue];
 
                 if (codedFruitMap[receivedValue]) {
-                    // This case is unlikely with single bit flip but for robustness
                     const receivedFruit = codedFruitMap[receivedValue];
                     codedResultText.textContent = `Kesalahan tidak terdeteksi! Diterima sebagai ${receivedFruit.name}.`;
-                    codedResultEmoji.textContent = '�';
+                    codedResultEmoji.textContent = '🤔';
                     codedResultCard.className = 'text-center p-4 rounded-lg bg-yellow-100 border border-yellow-300';
                 } else {
                     codedResultText.textContent = `Kode "${receivedValue}" tidak valid. Kesalahan terdeteksi! Pesan asli adalah ${originalFruit.name}.`;
@@ -317,8 +358,42 @@
                     }
                 }
             });
+
+            // Lanjutan Materi Logic
+            const word1Input = document.getElementById('word1');
+            const word2Input = document.getElementById('word2');
+            const calculateBtn = document.getElementById('calculate-hamming');
+            const hammingResult = document.getElementById('hamming-result');
+            const distanceValue = document.getElementById('distance-value');
+
+            function calculateHammingDistance(word1, word2) {
+                if (word1.length !== word2.length) {
+                    return -1;
+                }
+                let distance = 0;
+                for (let i = 0; i < word1.length; i++) {
+                    if (word1[i] !== word2[i]) {
+                        distance++;
+                    }
+                }
+                return distance;
+            }
+
+            calculateBtn.addEventListener('click', () => {
+                const word1 = word1Input.value.trim();
+                const word2 = word2Input.value.trim();
+                const distance = calculateHammingDistance(word1, word2);
+
+                if (distance === -1) {
+                    distanceValue.textContent = 'Panjang tidak sama!';
+                    hammingResult.className = 'mt-6 p-4 rounded-md bg-red-100 border border-red-300 text-center font-bold text-lg';
+                } else {
+                    distanceValue.textContent = distance;
+                    hammingResult.className = 'mt-6 p-4 rounded-md bg-white border border-gray-300 text-center font-bold text-lg';
+                }
+                hammingResult.style.display = 'block';
+            });
         });
     </script>
 </body>
 </html>
-�
